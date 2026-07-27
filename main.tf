@@ -9,5 +9,5 @@ module "ec2" {
 module "s3" {
   source = "./modules/s3"
 
-  bucket_name = "my-unique-demo-bucket-123456789"
+  bucket_name = "my-az-demo-bucket-ravi220"
 }
