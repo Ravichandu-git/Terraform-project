@@ -3,8 +3,8 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = 'us-east-1'
-        REPO_URL   = 'https://github.com/<username>/terraform-aws-infra.git'
+        AWS_REGION = 'ap-south-1'
+        REPO_URL   = 'https://github.com/Ravichandu-git/Terraform-project.git'
     }
 
     stages {
@@ -28,7 +28,7 @@ pipeline {
                             .parseText(githubSecret).token
 
                     sh """
-                    git clone https://${githubToken}@github.com/<username>/terraform-aws-infra.git
+                    git clone https://${githubToken}@github.com/ravichandu-git/terraform-project.git
                     """
                 }
             }
@@ -62,7 +62,7 @@ pipeline {
 
             steps {
 
-                dir('terraform-aws-infra') {
+                dir('terraform-project') {
 
                     sh '''
                     terraform init
@@ -78,7 +78,7 @@ pipeline {
 
             steps {
 
-                dir('terraform-aws-infra') {
+                dir('terraform-project') {
 
                     sh '''
                     terraform validate
@@ -94,7 +94,7 @@ pipeline {
 
             steps {
 
-                dir('terraform-aws-infra') {
+                dir('terraform-project') {
 
                     sh '''
                     terraform plan -out=tfplan
@@ -112,7 +112,7 @@ pipeline {
 
                 input message: "Deploy Infrastructure?"
 
-                dir('terraform-aws-infra') {
+                dir('terraform-project') {
 
                     sh '''
                     terraform apply -auto-approve tfplan
