@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "instance_name" {
-  default = "demo-ec2"
+  default = "raviinc-ec2"
 }
 
 variable "instance_type" {
