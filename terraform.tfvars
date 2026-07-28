@@ -6,4 +6,4 @@ instance_name = "my-server"
 
 instance_type = "t3.micro"
 
-bucket_name = "my-unique-demo-bucket-123456789"
+bucket_name = "terraform-my-ravi-220221"
