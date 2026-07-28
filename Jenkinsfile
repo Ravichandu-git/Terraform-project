@@ -1,14 +1,11 @@
 pipeline {
-
     agent any
-
     environment {
         AWS_REGION         = 'ap-south-1'
         REPO_URL           = 'https://github.com/Ravichandu-git/Terraform-project.git'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 script {
@@ -83,15 +80,80 @@ pipeline {
             }
         }
 
-        stage('Terraform Apply') {
-            steps {
-                input message: 'Deploy Infrastructure?'
+           stage('Wait for GitHub Approval') {
 
-                dir('terraform-project') {
-                    sh 'terraform apply -auto-approve tfplan'
+    steps {
+
+        script {
+
+            def githubSecret = sh(
+                script: '''
+                aws secretsmanager get-secret-value \
+                  --secret-id jenkins/github/token \
+                  --query SecretString \
+                  --output text
+                ''',
+                returnStdout: true
+            ).trim()
+
+
+            def githubToken = new groovy.json.JsonSlurper()
+                .parseText(githubSecret)["github-user"]
+
+
+            withEnv(["GH_TOKEN=${githubToken}"]) {
+
+                timeout(time: 60, unit: 'MINUTES') {
+
+                    waitUntil {
+
+                        def prNumber = sh(
+                            script: '''
+                            gh api \
+                            repos/Ravichandu-git/Terraform-project/pulls \
+                            --jq '.[0].number'
+                            ''',
+                            returnStdout: true
+                        ).trim()
+
+
+                        if (!prNumber) {
+                            echo "No open Pull Request found. Waiting..."
+                            return false
+                        }
+
+
+                        def approvedBy = sh(
+                            script: """
+                            gh api \
+                            repos/Ravichandu-git/Terraform-project/pulls/${prNumber}/reviews \
+                            --jq '.[] | select(.state=="APPROVED") | .user.login'
+                            """,
+                            returnStdout: true
+                        ).trim()
+
+
+                        echo "PR ${prNumber} approved by: ${approvedBy}"
+
+
+                        return approvedBy.contains("mohanreddy5678-git")
+                    }
                 }
             }
         }
+    }
+}
+
+
+               stage('Terraform Apply') {
+                 steps {
+                   dir('terraform-project') {
+
+                   sh 'terraform apply -auto-approve tfplan'
+
+        }
+    }
+}
     }
 
     post {
