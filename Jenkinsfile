@@ -38,21 +38,22 @@ pipeline {
             steps {
 
                 script {
-
                     def awsSecret = sh(
-                        script: """
-                        aws secretsmanager get-secret-value \
-                        --secret-id aws/terraform \
-                        --query SecretString \
-                        --output text
-                        """,
-                        returnStdout: true
-                    ).trim()
+                      script: """
+                      aws secretsmanager get-secret-value \
+                      --secret-id jenkins/aws/credentials \
+                      --query SecretString \
+                      --output text
+                       """,
+                     returnStdout: true
+                      ).trim()
 
-                    def creds = new groovy.json.JsonSlurper().parseText(awsSecret)
+                      def creds = new groovy.json.JsonSlurper().parseText(awsSecret)
 
-                    env.AWS_ACCESS_KEY_ID = creds.AWS_ACCESS_KEY_ID
-                    env.AWS_SECRET_ACCESS_KEY = creds.AWS_SECRET_ACCESS_KEY
+                       env.AWS_ACCESS_KEY_ID = creds.access_key
+                       env.AWS_SECRET_ACCESS_KEY = creds.secret_key
+                       env.AWS_DEFAULT_REGION = "ap-south-1"  
+                   
                 }
 
             }
