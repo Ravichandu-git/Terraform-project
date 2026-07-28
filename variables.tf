@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "instance_name" {
-  default = "mydemo-ec2"
+  default = "mychandu-ec2"
 }
 
 variable "instance_type" {
