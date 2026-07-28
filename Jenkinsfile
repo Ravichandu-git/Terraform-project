@@ -5,6 +5,10 @@ pipeline {
         REPO_URL           = 'https://github.com/Ravichandu-git/Terraform-project.git'
     }
 
+    triggers {
+        githubPush()
+    }  
+
     stages {
         stage('Checkout') {
             steps {
