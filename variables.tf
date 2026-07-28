@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "instance_name" {
-  default = "ravi-ec2"
+  default = "ravichandu-ec2"
 }
 
 variable "instance_type" {
