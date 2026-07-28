@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "instance_name" {
-  default = "ec2-test"
+  default = "aws-ec2"
 }
 
 variable "instance_type" {
