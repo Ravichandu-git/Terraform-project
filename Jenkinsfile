@@ -4,7 +4,6 @@ pipeline {
 
     environment {
         AWS_REGION         = 'ap-south-1'
-        AWS_DEFAULT_REGION = 'ap-south-1'
         REPO_URL           = 'https://github.com/Ravichandu-git/Terraform-project.git'
     }
 
