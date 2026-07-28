@@ -84,12 +84,13 @@ pipeline {
             }
         }
 
-           stage('Manual Approval') {
+       stage('Manual Approval') {
     steps {
         timeout(time: 30, unit: 'MINUTES') {
             input(
                 message: 'Approve Terraform Apply?',
-                ok: 'Deploy'
+                ok: 'Deploy',
+                submitter: 'Mohan'
             )
         }
     }
