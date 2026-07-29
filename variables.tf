@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "instance_name" {
-  default = "aws-ec2"
+  default = "chandu-ec2"
 }
 
 variable "instance_type" {
