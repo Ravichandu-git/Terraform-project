@@ -1,2 +1,4 @@
 # Terraform files require reviewer approval
 **/*.tf @mohanreddy5678-git
+*.tf @mohanreddy5678-git
+*.tfvars @mohanreddy5678-git
