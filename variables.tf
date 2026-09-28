@@ -14,7 +14,4 @@ variable "ami_id" {
   description = "Amazon Linux 2023 AMI"
 }
 
-variable "bucket_name" {
-  description = "Globally unique S3 bucket name"
-  type        = string
-}
+
