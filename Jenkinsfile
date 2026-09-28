@@ -1,44 +1,24 @@
 pipeline {
     agent any
+
     environment {
         AWS_REGION         = 'ap-south-1'
-        REPO_URL           = 'https://github.com/Ravichandu-git/Terraform-project.git'
+        REPO_URL            = 'https://github.com/Ravichandu-git/Terraform-project.git'
     }
 
-    triggers {
-        githubPush()
-    }  
-
     stages {
-        stage('Checkout') {
+
+        stage('Git Clone') {
             steps {
-                script {
-
-                    def githubSecret = sh(
-                        script: '''
-                        aws secretsmanager get-secret-value \
-                          --secret-id jenkins/github/token \
-                          --query SecretString \
-                          --output text
-                        ''',
-                        returnStdout: true
-                    ).trim()
-
-                    def githubToken = new groovy.json.JsonSlurper()
-                        .parseText(githubSecret)["github-user"]
-
-                    sh '''
-                    rm -rf terraform-project
-                    '''
-
-                    sh """
-                    git clone https://${githubToken}@github.com/Ravichandu-git/Terraform-project.git terraform-project
-                    """
-                }
+                git(
+                    url: "${REPO_URL}",
+                    branch: 'main',
+                    credentialsId: 'git-creds'
+                )
             }
         }
-
-        stage('Read AWS Credentials') {
+		
+		stage('Read AWS Credentials') {
             steps {
                 script {
 
@@ -62,50 +42,55 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                dir('terraform-project') {
-                    sh 'terraform init'
-                }
+                sh '''
+                    terraform init
+                '''
             }
         }
 
+        stage('Terraform Format') {
+    steps {
+        sh '''
+            terraform fmt -recursive
+        '''
+    }
+}
+
         stage('Terraform Validate') {
             steps {
-                dir('terraform-project') {
-                    sh 'terraform validate'
-                }
+                sh '''
+                    terraform validate
+                '''
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                dir('terraform-project') {
-                    sh 'terraform plan -out=tfplan'
+                sh '''
+                    terraform plan -out=tfplan
+                '''
+            }
+        }
+
+        stage('Manual Approval') {
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input(
+                        message: 'Approve Terraform Apply?',
+                        ok: 'Deploy',
+                        submitter: 'mohan'
+                    )
                 }
             }
         }
 
-       stage('Manual Approval') {
-    steps {
-        timeout(time: 30, unit: 'MINUTES') {
-            input(
-                message: 'Approve Terraform Apply?',
-                ok: 'Deploy',
-                submitter: 'Mohan'
-            )
+        stage('Terraform Apply') {
+            steps {
+                sh '''
+                    terraform apply -auto-approve tfplan
+                '''
+            }
         }
-    }
-}
-
-
-               stage('Terraform Apply') {
-                 steps {
-                   dir('terraform-project') {
-
-                   sh 'terraform apply -auto-approve tfplan'
-
-        }
-    }
-}
     }
 
     post {
@@ -114,7 +99,11 @@ pipeline {
         }
 
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline failed.'
+        }
+
+        always {
+            echo 'Terraform pipeline execution completed.'
         }
     }
 }
