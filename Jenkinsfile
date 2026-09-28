@@ -78,7 +78,7 @@ pipeline {
                     input(
                         message: 'Approve Terraform Apply?',
                         ok: 'Deploy',
-                        submitter: 'mohan'
+                        submitter: 'ravi'
                     )
                 }
             }
